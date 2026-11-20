@@ -1,0 +1,781 @@
+.\" Manpage for niccli.
+.\" Contact broadcom@broadcom.com to correct errors or typos.
+.TH man 1 "19 March 2025" "2.0" "niccli man page"
+.SH NAME
+niccli \- Broadcom NIC configuration utility
+.SH SYNOPSIS
+.TP
+niccli [-h|--help] <command>
+.TP
+niccli --version
+.TP
+niccli [--list | --list_devices | --list_ethernet]
+.TP
+niccli [--dev <index | SS:BB:DD.F | mac | NIC interface] <cmdline>
+.TP
+niccli [--pci <SS:BB:DD.F> <cmdline>
+.TP
+niccli [-i <index>] <cmdline>
+.TP
+niccli -i <index> --help
+.TP
+
+niccli -i <index> show --all
+           show [-d|--device_info]
+           show -p|--pkg_ver [-f <firmware package>]
+           show -D|--device_pci_ids [-f <firmware package>]
+           show -c|--certificate [-s|--slot <slot number>]
+           show -n|--nvm_measurement
+           show -g|--pcb_gen2_otp
+           show --health
+           show -r | --recommendations [--nvm [-f <firmware package>]] [--pcie] [-V]
+.TP
+
+niccli -i <index> nvm -l|--list [-V] [-f <firmware package file name>]
+           nvm --view [-V] [-f <firmware package file name>] [-t|--type <nvm directory name>]
+           nvm --verify [-V] [-f <firmware package file name>]
+           nvm -n|--sync
+           nvm -F|--restore_factory_defaults [--silent]
+           nvm -r|--dir_read -f <file name>  -t|--type <nvm directory name>
+           nvm -w|--dir_write -f <file name>  -t|--type <nvm directory name>
+           nvm -S|--saveoptions -f <file name>
+           nvm -O|--optionhelp <option name>
+           nvm -g|--getoption <option name> [--scope <scope index>]
+           nvm -s|--setoption <option names with comma seperated>
+               -v|--value <option value with comma seperated> [--scope <scope index>]
+           nvm -b|--backup [--cfg]
+           nvm -L|--listoptions --diff
+           nvm --dump --cfg -f <filename>
+           nvm --dump -f <filename>
+           nvm --dump <-o|--offset> <val> --length <val> -f <filename>
+.TP
+niccli -i <index> fw <-u|--update> -f <package file> [--force] [-y|--yes]
+           fw <-u|--update> <--online> [--force] [-y|--yes]
+           fw <-u|--update> -f <package file> <--recovery> [--force] [-y|--yes]
+           fw <--reset> [--immediate]
+           fw <-l|--livepatch> <--show>
+           fw <-l|--livepatch> <-a|--activate> [target_fw]
+           fw <-l|--livepatch> <-d|--deactivate> [target_fw]
+           fw <-l|--livepatch> <-p|--patch_update> [target_fw] -f <patch file>
+.TP
+niccli -i <index> qos <-E|--ets> --show
+           qos <-E|--ets --tsa <tc[0-7]:[ets|strict], ...> --up2tc <priority[0-7]:tc>, ...>
+                       --tcbw <list>
+           qos --pfc --enable <pfc list>
+           qos --up2tc --pri <priority[0-7]:tc, ...>
+           qos --apptlv <-a|--add> [<-d|--del>] --app <priority,selector,protocol>
+           qos <-D|--dscp2prio>
+           qos <-l|--listmap> --pri2cos
+           qos --tc --set <-T|--rate_limit> <list of rate limit>
+           qos <-r|--rx_port_rate_limit> --set --max <value> [-p|--persistent]
+           qos <-R|--rx_rate_limit> --show [-p|--persistent]
+           qos <-X|--rx_ep_rate_limit> --set --ep0 <value> [--ep1 <value>] [--ep2 <value>]
+                [--ep3 <value>] [-p|--persistent]
+           qos <-t|--tx_partition_rate_limit> --show [-p|--persistent]
+           qos <-t|--tx_partition_rate_limit> --set --max <value> [-p|--persistent]
+           qos <-P|--tx_port_rate_limit> --show
+           qos <-P|--tx_port_rate_limit> --set --max <value>
+           qos <-x|--tx_ep_rate_limit> --show
+           qos <-x|--tx_ep_rate_limit> --set <--port> <port number> --ep0 <value>
+               [--ep1 <value>] [--ep2 <value> [--ep3 <value>] [-p|--persistent]
+           qos <-n|--ingress> --cosq --show [-p|--persistent]
+           qos <-n|--ingress> --cosq --set --state <value> [--mode <value>] [-p|--persistent]
+           qos <-e|--egress> --cosq --show [-p|--persistent]
+           qos <-e|--egress> --cosq --set --state <value> [-p|--persistent]
+           qos -g|--timed_tx_pacing_rate_profile --show
+.TP
+niccli -i <index> linkdiag -T|--txfir --show <-M|--modulation_type> <mod_type> <-l|--lane> <lane_number>
+           linkdiag -T|--txfir --set  <-M|--modulation_type> <mod_type> <-l|--lane> <lane_mask>
+                    --pre1 <value>  --pre2 <value> [--pre3 <value>] --main <value>
+                    --post1 <value> --post2 <value> [--post3 <value> --amp <value>
+                    --nlcl <value> --nlcu <value>]
+           linkdiag -T|--txfir --show <-M|--modulation_type> <mod_type> <-l|--lane>
+                    <lane_number>
+           linkdiag -F|--fdrstat [--start] [--stop] [--clear] [--counters]
+           linkdiag -D|--dscdump -l|--lane <lane_number> [-a|--diag_level <level>]
+           linkdiag -L|--loopback --show
+           linkdiag -L|--loopback [<-R|--phy_remote> | <-p|--phy_local> | <-m|--mac_local> | <-d|--disable>]
+           linkdiag -L|--loopback [--external] [--RJ45]
+           linkdiag -P|--prbs_test <-e|--enable | -d|--disable> [--mode <mode_value>
+                    [<-r|--rx_lane_mask> <value>] [<-t|--tx_lane_mask> <value>]
+                    [<-s|--duration> <value in seconds>] [--tcode]]
+
+.TP
+niccli -i <index> serdes --eye -e|--ethernet [-l|--lane <ethernet lane number>] [<-P|--plot>]
+           serdes --eye -p|--pci <-l|--lane> <pci_lane_number> [-P|--plot] [-t|--target_ber <value>]
+           serdes --eye -p|--pci -s|--stop
+.TP
+niccli -i <index> vf <-t|--trust> --set <-v|--vf_index> <idx> <--state> <enable/disable>
+           vf <-t|--trust> --show <-v|--vf_index> <idx>
+           vf <-a|--add_ntuple_filter> <-m|--macaddress> <value> <-p|--dest_port> <value>
+              <-P|--dest_port_mask> <value> <-v|--vf_index> <idx> <-T|--ip_type> <value>
+           vf <-d|--free_ntuple_filter> <-l|--filter_id> <value>
+           vf <-M|--peer_mem_map> <--hpa> <list of values> <--gpa> <list of values>
+              <--size> <list of values>
+.TP
+niccli -i <index> cable -m|--module_info --show
+           cable -r|--read_module_eeprom [-p|--page_number <page number> -o|--offset <byte offset>
+                 -l|--length <number of bytes> -b|--bank <bank number> -i|--i2c_address <i2c addr>]
+           cable -w|--write_module_eeprom -p|--page_number <page number> -o|--offset <byte offset>
+                 -v|--value <bytes>
+           cable -M|--module_loopback -t|--loopback_type <type> [--lane <module_lane_number>]
+.TP
+niccli -i <index> link -s|--status
+           link -c|--counters --show
+           link -p|--port_state <port state value>
+           link -S|--port_speed [--speed <value>] [--lanes <number_of_lanes>] -a|--autoneg <on/off> [--fec <value>] [-t|--training <on/off>]
+           link -P|--precoding <enable/disable>
+.TP
+niccli -i <index> timesync < -d | --dutycycle> <--period> <value> --up <value>
+           timesync <--dll> <-s | --source> <value> <-q | --frequency> <value>
+           timesync <--ptp> --show
+           timesync <--ptp> --set <-p | --primary_pf> <pid> [<-v | --primary_vf> <vfid>]
+                    [<-P | --secondary_pf> <pfid>] [<-V | --secondary_vf> <vfid>]
+           timesync <--synce> --show
+           timesync <--synce> --set <-Q | --frequency_profile> <value> [<-c | --primary_clock_state>
+                    <value>] [<-C | --secondary_clock_state> <value>]
+           timesync <--tsio> <-t | --tsio_function_pin> <idx> <-u | --pin_usage_string> <value>
+                    <--state> <value>
+.TP
+niccli -i <index> counters -p | --pcie
+           counters -c | --clear
+           counters -P | --port [--dir <rx/tx>]
+           counters -r | --roce
+           counters --l2
+
+.TP
+niccli -i <index> tunnel --cfg --vxlan <-t|--type> <ipv4|ipv6> --show
+           tunnel --cfg --vxlan <--add> <-t|--type> <ipv4|ipv6> <-p|--dest_port> <value>
+           tunnel --cfg --vxlan <--del> <-t|--type> <ipv4|ipv6> <-p|--dest_port> <value>
+           tunnel --cfg <--rss> --show
+           tunnel --cfg <--rss> --set <--mode> <inner/outer>
+           tunnel --cfg <-g|--gre_tunnel_offload> --show
+           tunnel --cfg <-g|--gre_tunnel_offload> --set --state <enable/disable>
+
+.TP
+niccli -i <index> msix -m|--max_vectors --show [--all | --pf <pf number>]
+           msix -m|--max_vectors --set [--pf <pf number>]
+.TP
+niccli -i <index> mh -p|--pf_alloc --show
+           mh -p|--pf_alloc --set --ep0 <pf_cnt> --ep1 <pf_cnt> --ep2 <pf_cnt> --ep3 <pf_cnt>
+.TP
+niccli -i <index> resmgmt [--pf/--all] [<-p|--profile> | < --min > |< --max > | <-r | --roce_max> |
+                           < -m | --max_completion_rings> | < -s | --strategy >] --show
+           resmgmt [--pf/--all] --set [<-p|--profile> | < --min > |< --max > | <-r | --roce_max> |
+                   < -m | --max_completion_rings>] [< --bw <bandwith of each pf with comma separated>]
+                   [< -s | --strategy > < minimal/maximal/minimal-static>]
+.TP
+niccli -i <index> ccparams -d|--dump
+           ccparams --set -f <configuration file>
+.TP
+niccli -i <index> debug -c|--coredump [-d|--ddr] [-l|--l1cc] [-f <file name>]
+           debug -s|--snapdump [-f <file name>]
+           debug -K|--token -a|--supported_claims [–-show |-f <output_filename>]
+           debug -K|--token -A|--active_claims> [–-show |-f <output_filename>]
+           debug -K|--token -G|--generate -f|--file <claims_file> [-o|--output_file <unsigned_CBOR_file>]
+           debug -K|--token -I|--insert -N|--signature_file <signature file> -f|--file <claims_file> [-o|--output_file <signed_CBOR_file>]
+           debug -K|--token -E|--enable -f|--file <signed_CBOR_file>
+           debug -K|--token -B|--disable
+
+.TP
+niccli -i <index> pcie <-c|--compliance> --state <0/1>
+           pcie <-c|--compliance> --show
+
+.SH DESCRIPTION
+.B
+ The NICCLI configuration utility sets the nonvolatile configuration elements of the Broadcom Ethernet
+ network adapter, such as enabling or disabling RoCE, SR-IOV, and other options.
+
+ The NICCLI configuration utility can also perform firmware upgrades.
+
+ The NICCLI configuration utility uses the Sliff driver for its communication with the underlying firmware and
+ performs the management operation on Broadcom Ethernet network adapters.  NICCLI operates independently
+ with or without the L2 drivers.
+ The NICCLI configuration utility supports both the BCM9574XX and BCM95750X family of devices.
+
+.SH OPTIONS
+.TP
+.B \ --version
+ Display the current version of the application.
+.TP
+
+.B \ --help
+ Lists the available commands.
+.TP
+
+.B \ quit
+ Quits the application (User in Interactive mode of the utility).
+.TP
+
+.B \--list
+ List available Broadcom NIC adapters
+.TP
+
+.B \--list_ethernet
+ List available Broadcom NIC adapters (with interface details)
+.TP
+.B \--list_devices
+ List available Broadcom NIC adapters (with interface and name details)
+
+.TP
+.B \ show
+ This command will display all the basic details of the device.
+        --all                               Display all the details of the device.
+        -p|--pkg_ver                        Display firmware package version installed
+        -D|--device_pci_ids                 Display Broadcom device id information.
+        -d|--device_info                    Display the basic details of the device
+        -c|--certificate                    Display the imported certificate chain on the device.
+                                            This command is supported on BCM9575xxx and BCM9576xxx
+                                            devices.
+        -s|--slot                           Slot number is where certificate chain on the device is
+                                            imported. The valid values are from 0 to 7.
+                                            The default value is 0.
+        -n|--nvm_measurement                Display whether the NVM configuration that is active in the
+                                            system has been changed or not. To facilitate this, a hash
+                                            is generated based on nvm configuration. The hash
+                                            represents the measurement of the configuration. This
+                                            command is supported on BCM9575xxx and BCM9576xxx devices.
+        --health                            Display the device health.
+        -g|--pcb_gen2_otp                   Display the PCB gen2 device OTP. This command is supported
+                                            on BCM9574xxx devices.
+        -f                                  Display firmware package file information.
+        -r|--recommendations                Display the self debug recommendations to the user.
+        --pcie                              This option is used to show the PCIe self debug recommendations to the user.
+        -V                                  Verbosity, shows the detailed information.
+        --nvm                               This option is used to show the nvm self debug recommendations to the user.
+
+
+.TP
+.B \ nvm
+ NVM configuration option of a device.
+ This command provides
+          - Display the current settings of the NVM configuration.
+          - Configure the current settings of the NVM configuration.
+          - Save the current settings of the NVM configuration.
+
+
+       --view                           View the NVM item data.
+       -l|--list                        Display the NVM components and its associated version details.
+       --verify                         Verify packages & NVM.
+       -F|--restore_factory_defaults    Restores NVM configuration to factory defaults.
+       -n|--sync                        Synchronize SBI, SRT and CRT Primary and Secondary FW images.
+                                        Supported on BCM9575xxx and BCM9576xxx devices.
+       -r|--dir_read                    Read the NVM item data and write its contents to a file.
+       -w|--dir_write                   Create or overwrite NVM data item with a file.
+       -S|--saveoptions                 Save NVM configuration options on the device to a file.
+                                        Only the end user access NVM configuration options are saved.
+       -O|--optionhelp                  Detailed help for the NVM configuration option.
+       -g|--getoption                   Get NVM configuration option of a device.
+       --setoption                      Set NVM configuration option of a device.
+       -v|--value                       The value for the specified option. Value can be in hex or decimal format
+       --scope                          The scope can be either of 'function' or 'port' index.
+       -b|--backup                      Backup NVM contents to a file.
+       --cfg                            This option is used to backup only the nvm config and is applicable only
+                                        with --backup option.
+       -L|--listoptions                 Displays current and default NVM configuration options of a device.
+       --diff                           Displays the difference between current and default NVM
+                                        configuration options of a device.
+       --silent                         Silent option. Do not prompt for user message.
+       --dump                           This command extracts the NVRAM content and performs a raw dump into,
+                                        the file specified by user.
+       -o|--offset                      Offset value in hex.
+       --length                         Number of bytes (in hex) to dump (multiple of 4).
+       -V                               Verbosity.
+       -f                               Input file name.
+       -t|--type                        Input NVM directory name string.
+
+
+.TP
+
+.B \ fw
+ Performs Firmware operations
+
+        -u|--update          Perform the firmware install/update.
+        -f|--file            This option is to provide the package file.
+        --force              Forces the installation of the package file. This option can
+                             also be used with the --recovery option to erase the complete NVM.
+        --reset              This option is to perform the reset operations.
+        -y|--yes             Answer as "yes" in prompts.
+        --immediate          This option is to reset the device without reloading the drivers.
+        -l|--livepatch       Perform the firmware live patch operations.
+        --show               Show the livepatch target firmware versions.
+        -a|--activate        Activate the firmware livepatch from the NVM.
+        -d|--deactivate      Deactivate the firmware livepatch from the NVM.
+        -p|--patch_update    Update the patch file directly to the device i.e. without
+                             installing it in NVM.
+        target_fw            Target firmware is an optional parameter to active/deactivate
+                             the livepatch. By default tool updates all the supported
+                             target firmwares. target_fw strings supported are "common_fw"
+                             or "secure_fw" on BCM95750x devices. "chimp_fw" string is
+                             supported on BCM9574x devices.
+        --online             Fetch firmware image online from Broadcom web server & perform update.
+        -r|--recovery        Recovers the adapter and updates the package file.
+
+
+.TP
+.B \ qos
+ This command can be used to query and configure the various QOS parameters such as
+ ETS, priority to traffic class, application TLV's, receive rate control, tx and rx rate limits
+ transmit(egress) and receive(ingress) buffer threshold input parameters.
+        -E|--ets                       Query or Configure enhanced transmission selection,
+                                       priority to traffic class, traffic class bandwidths and the
+                                       list of configured application tlvs.
+        --tsa                          Transmission selection algorithm, sets a comma separated list
+                                       of traffic classes to the corresponding selection algorithm.
+                                       Valid algorithms include "ets" and "strict".
+        --up2tc                        Comma separated list mapping user priorities to traffic classes.
+        --tcbw                         Comma separated list of bandwidths for each traffic class
+                                       the first value being assigned to traffic class 0 and the
+                                       second to traffic class 1 and so on.
+        --pfc                          Enable priority based flow control on a given priority.
+        -apptlv                        Configure the priority of the application TLV.
+        -a|--add                       Add the priority of the application TLV.
+        -d|--del                       Delete the priority of the application TLV.
+        --app                          Key to provide the priority, selector, protocol
+                                       for configuring the application TLV.
+        -D|--dscp2prio                 query the dscp to priority mapping.
+        -l|--listmap                   List the priority mapping and related queue id for a
+                                       given physical function.
+        --pri2cos                      List the priority to traffic class mapping.
+        --tc                           Command to set the rate limit for each traffic class.
+        -T|--rate_limit                Option to provide comma seperated percentage limit for each TC.
+        -r|--rx_port_rate_limit        Configure the receive side port rate limit
+        --max                          The max option specifies an 8-bit rate limit as a percentage of
+                                       total link bandwidth with a range of 0 to 100 percent. A value
+                                       of 0 indicates no rate limit and deletes the previously
+                                       configured rate limit.
+        -p|--persistent                Option to write the configuration to NVRAM, but it does not take
+                                       effect immediately.
+        -R|--rx_rate_limit             Query the configured receive side rate control parameters.
+        -X|--rx_ep_rate_limit          Configure the receive side rate control parameters for a given endpoint.
+        -t|--tx_partition_rate_limit   Query and Configure the transmit side partition. Rate limit applies
+                                       to traffic sent from a partition, which is one PF and all of its
+                                       child VFs.
+        -P|--tx_port_rate_limit        Query and Configure the transmit side port rate limit.
+        --port                         Specify the index of the external port of the device.
+        --ep(x)                        Specify the Tx or Rx endpoints rate limit values.
+        -x|--tx_ep_rate_limit          Query and Configure the PCIe endpoint transmit rate control.
+        -n|--ingress                   Query and configure the QoS dynamically at receive buffer
+                                       thresholds by configuring different input parameters.
+        -e|--egress                    Query and configure the QoS dynamically at transmit
+                                       buffer thresholds by configuring different input parameters.
+        --cosq                         This option is used to query or set the cosq parameter
+                                       i.e. cosq state and the mode.
+        --state                        Bitmask field indicating which traffic classes are enabled or disabled.
+                                       Each bit represents a specific traffic class, where bit 0
+                                       represents traffic class 0 and so on. A value of 0 indicates
+                                       that the traffic class is not enabled.
+        --mode                         Bitmask field indicating which traffic class are lossy or
+                                       lossless. Each bit represents a specific traffic class,
+                                       where bit 0 represents traffic class 0 and so on. A value
+                                       of 0 indicates that the traffic  class is lossy and
+                                       value 1 indicates that the traffic class is lossless.
+        -g|--timed_tx_pacing_rate_profile        Query the timed tx pacing rate profile.
+
+
+.TP
+
+.B \ linkdiag
+
+ This command is used to perform the link diagnostic tests like PRBS,
+ loopback, DSCDump and TXFIR settings.
+
+        -T|--txfir             This option is used to query and configure the TX FIR (transmitter
+                               finite impulse response)
+        -F|--fdrstat           This option is used for FDR(Flight Data Recorder) to collect the
+                               FEC Performance data.
+        -D|--dscdump           This option is used to retrieve DSC dump data from a device
+        -L|--loopback          This option is used to query and configure the different loopback Modes
+                               i.e. phy loopback, mac loopback and external loopback.
+        -P|--prbs_test         This option is used in port interface debugging to analyze the quality
+                               of the link. The test can be run on a port or per lane with a
+                               specific polynomial.
+                                Note:
+                                    1) The interface(s) should be fully initialized prior to the testing.
+                                    2) During the testing, there should not be any queries or configs
+                                    sent to the card. "ifdown" the interface(s) is recommended.
+        -M|--modulation_type   Modulation types of TxFIR. Supported values are 'NRZ','PAM4','C2MNRZ',
+                               'C2MPAM4', 'PAM4-112','C2MPAM4-112G' and 'LPOPAM4-112G' of the
+                               device.  The modulation types 'PAM4-112','C2MPAM4-112G' and
+                               'LPOPAM4-112G' are  only supported on BCM5760x devices.
+                               The modulation types 'PAM4' and 'C2MPAM4' are supported
+                               on BCM5750x and BCM5760x devices.
+        -l|--lane              TXFIR show command takes the MRS lane number and lane mask for the TXFIR
+                               configuration. To collect the dsc dump on all the supported
+                               lanes, please provide a value of 65535. DSC dump on all lanes
+                               is supported  only on BCM9576xx devices.
+        --pre1                 This is a mandatory parameter to configure the TXFIR settings.
+                               This parameter is supported for all the modulation types and
+                               the valid range is from -32768 to 32767.
+        --pre2                 This is a mandatory parameter to configure the TXFIR settings.
+                               This parameter is supported for all the modulation types and
+                               the valid range is from -32768 to 32767.
+        --main                 This is a mandatory parameter to configure the TXFIR settings.
+                               This parameter is supported for all the modulation types and
+                               the valid range is from -32768 to 32767.
+        --post1                This is a mandatory parameter to configure the TXFIR settings.
+                               This parameter is supported for all the modulation types and
+                               the valid range is from -32768 to 32767.
+        --post2                This is a mandatory parameter to configure the TXFIR settings.
+                               This parameter is supported for all the modulation types and
+                               the valid range is from -32768 to 32767.
+        --pre3                 This is an optional parameter to configure the TXFIR settings.
+                               This parameter is supported on following modulation types i.e,
+                               'LPOPAM4-112G', 'PAM4-112', 'C2MPAM4' and 'C2MPAM4-112G'.
+                               The valid range is from -32768 to 32767.
+        --post3                This is an optional parameter to configure the TXFIR settings.
+                               This parameter is supported on following modulation types
+                               i.e, 'NRZ','PAM4' and 'C2MNRZ'.
+                               The valid range is from -32768 to 32767.
+        --amp                  This is an optional parameter to configure the TXFIR settings.
+                               This parameter is supported on following modulation types
+                               i.e, 'NRZ','PAM4','C2MNRZ','PAM4-112','C2MPAM4' and 'C2MPAM4-112G'.
+                               The valid range is from -32768 to 32767.
+        --nlcu                 This is an optional parameter to configure the TXFIR settings.
+                               This parameter is supported only on 'LPOPAM4-112G' modulation
+                               type. The valid range is from -100 to 100.
+        --nlcl                 This is an optional parameter to configure the TXFIR settings.
+                               This parameter is supported only on 'LPOPAM4-112G' modulation type.
+                               The valid value is 0.
+        --start                This is an optional parameter to start the fdrstat.
+        --stop                 This is an optional parameter to stop the fdrstat.
+        --clear                This is an optional parameter to clear the fdrstat.
+        --counters             This is an optional parameter to pull the fdrstat counters information.
+        -a|--diag_level        This is an optional parameter. If the user does not specify this
+                               parameter by default DSC dump will be collected on all the
+                               supported diag levels. Supported diag levels are as follows:
+                                    0 = diag lane
+                                    1 = diag core
+                                    2 = diag event
+                                    3 = diag eye
+                                    4 = diag reg core
+                                    5 = diag reg lane
+                                    6 = diag uc core
+                                    7 = diag uc lane
+                                    8 = diag lane debug
+                                    9 = diag ber vert
+                                    10 = diag ber horz
+                                    11 = diag event safe
+                                    12 = diag timestamp
+        -R|--phy_remote        This option enables loopback of local PHY Rx to peer PHY Tx.
+                               The packets transmitted by peer are looped back to the
+                               peer at the PHY. No packets will reach the host.
+                               Host will see a link down.
+        -p|--phy_local         This option enables a loopback of local TX to local RX at the PHY.
+                               Any packets transmitted from the host are looped back to the host.
+                               No packets will be transmitted on the line. If any peer is connected,
+                               the peer should ignore the link status from the host.
+        -m|--mac_local         This option enables a loopback of local TX to local RX at the MAC.
+                               Any packets transmitted from the host are looped back to the host.
+                               No packets will be transmitted on the line. If any peer is connected,
+                               the peer should ignore the link status  from host.
+        -d|--disable           This option disables the current loopback settings. In case of
+                               prbs_test this option disables the PRBS test.
+        --external             This option prepares the PHY from external loopback and suppresses NONCE
+                               generation for auto negotiation to work with an external loopback. This
+                               option should only be used if the same port external loopback dongle or
+                               equivalent is used. Without this option and AN enabled,
+                               the host may not see a link up.
+        --RJ45                 This test is designed for dual port 10GBase-T where the PRBS test is not
+                               applied. A compliant UTP cable is needed to connect between the two
+                               ports of the controller because auto-negotiation is required to establish
+                               a link Traffic is initiated from one port. The PHY of the other port is put
+                               into a remote loopback mode, essentially serving as a loopback plug, to
+                               bounce packets back to the initiating port. This test requires the
+                               production Linux driver (bnxt_en) to be loaded in order to execute.
+                               Packets are sent and received through the Linux OS network stack.
+        -e|--enable            Enable the PRBS test
+        --mode                 Specify the supported modes. And the supported modes are 'PRBS31','PRBS7',
+                               'PRBS9', 'PRBS11','PRBS15','PRBS23','PRBS58','PRBS49','PRBS10','PRBS20'
+                               and 'PRBS13'. The default mode value is PRBS31.
+        -r|--rx_lane_mask      Receiver lane mask value.
+        -t|--tx_lane_mask      Transmitter lane mask value.
+        -s|--duration          Duration to run the prbs test. Default time is 10 seconds
+        --tcode                If this option was provided the prbs test will run on t-code project as well.
+        <TXFIR_VALUES>         -pre1 <value> -pre2 <value> -pre3 <value> -main <value>
+                               -post1 <value> -post2 <value> -nlcl <value> -nlcu <value>
+
+
+.TP
+.B \ serdes
+ This command is used to plot the serdes ethernet eye, PCI eye scope and margin values of the eye.
+     Note:
+         1. While plotting the serdes ethernet eye the link toggling is expected.
+         2. Serdes ethernet and pci eye shares the resources of the NIC. Therefore, these commands
+            cannot be run concurrently. If pci eye is running and you attempt to run ethernet eye
+            tool will return failure.
+        --eye            This option is used to plot the serdes pci and ethernet eye.
+        -e|--ethernet    This option is used to plot the serdes ethernet eye.
+                         By default this options displays only horizontal and
+                         vertical margin values, including the test result.
+        -p|--pci         This option is used to plot the serdes pci eye.
+        -l--lane         This option is used to specify the lane number. For pcie serdes test,
+                         the maximum value is the device pcie lane width minus 1. Valid values
+                         are from 0 to 15. For ethernet serdes test the valid range is from 0 to 7.
+        -P|--plot        This is an optional parameter. When user specifies this option, will plot the
+                         eye and displays the horizontal and vertical margin values, including the
+                         test result.
+        -t|--targetber   This option is used to specify the target bit error rate. By default serdes pci eye
+                         is plotted with BER "1e-8". This option is only supported on BCM9575xxx and above
+                         devices. The supported target BER values are "1e-8", "1e-9", "1e-10" and "1e-11"
+        -s|--stop        This option is used to stop the running serdes pci eye plotting.
+                         This option is only supported on BCM9575xxx and above devices.
+.TP
+
+.B \ VF
+ Performs VF operations
+        -t|--trust                  Perform the trusted VF operations.
+        -v|--vf_index               Provide the VF index.
+        --state                     Option to enable or disable the trusted VF.
+        -a|--add_ntuple_filter      Option to add the ntuple flow filter.
+        -d|--free_ntuple_filter     Option to free the ntuple flow filter.
+        -m|--macaddress             MAC address in format xx:xx:xx:xx:xx:xx.
+        -p|--dest_port              Option to provide the destination port.
+        -P|--dest_port_mask         Option to provide the destination port mask.
+        -T|--ip_type                Option to provide the IP type. The valid values are:
+                                     1 - IPV4, 2 - IPV6, 3 - ARP-REPLY
+        -M|--peer_mem_map           Option to configure the GPU host and guest physical address mapping.
+        --hpa                       This option is used to specify the list of host physical addresses.
+                                    Max 8 entries are supported. User has to provide the list with a comma
+                                    seperated for each host physical address. The value should be in the
+                                    hex-decimal.
+        --gpa                       This option is used to specify the list of guest physical addresses.
+                                    Max 8 entries are supported. User has to provide the list with a comma
+                                    seperated for each guest physical address. The value should be in the
+                                    hex-decimal.
+        --size                      This option is a comma separated list in kilobytes for each mapping.
+                                    Max 8 entries are supported. The value should be in the hex-decimal.
+
+
+.TP
+.B \ cable
+ Query/Decode Module EEPROM information and optical diagnostics.
+        -m|--module_info              Get the module information
+        -r|--read_module_eeprom       Read the module EEPROM in hex format
+        -w|--write_module_eeprom      Write the bytes into the module EEPROM
+        -i|--i2c_address              I2C address of a page. Value less than 0x7f expected
+                                      Most of the EEPROMs use 0x50 or 0x51
+        -p|--page_number              The page number that is being accessed over I2C
+        -l|--length                   Length of EEPROM data to read or write
+        -o|--offset                   Offset within the page that is being accessed over I2C
+        -b|--bank                     The bank number of the page that is being accessed over I2C
+        -v|--value                    Bytes to write into module EEPROM
+        -M|--module_loopback          This option is used to perform the various module loopback. This
+                                      operation is supported only on CMIS 4.0 and above supported modules.
+        -t|--loopback_type            This option is used to ran the module loopback on the specified
+                                      loopback type. The supported module loopback types are as below:
+                                         1 - Media Side Output Loopback
+                                         2 - Media Side Input Loopback
+                                         3 - Host Side Output Loopback
+                                         4 - Host Side Input Loopback
+        --lane                        This is an optional parameter. If user specify this option with a
+                                      valid lane number, then the module loopback will be run on specified lane.
+        --show                        Displays the information in detailed.
+.TP
+
+.B \ link
+ This command is used to query the link status, BER information, physical counters
+ and configure the port state.
+        -s|--status        Shows the link status and related information
+        -c|--counters      Show physical counters and BER Info
+        -p|--port_state    Configures the portstate. The valid values are 0(Down), 1(UP) and 2(Toggle)
+        -S|--port_speed    Configures the port speed for the number of lanes, Link training, Autoneg and FEC.
+        --speed            Option to provide the speed value in MB.
+        --lanes            Option to provide the number of lanes. The valid values are 1,2,4 and 8
+        -a|--autoneg       Option to on/off the autoneg speed. The valid values are "on", "off"
+        -t|--training      Option to on/off the link training. The valid values are "on", "off"
+        --fec              Option to provide the FEC type. The valid values are:
+                             1 - FEC Autoneg enable
+                             2 - FEC Autoneg disable
+                             3 - FEC Clause74 enable
+                             4 - FEC Clause74 disable
+                             5 - FEC Clause91 enable
+                             6 - FEC Clause91 disable
+                             7 - FEC RS544_1XN enable
+                             8 - FEC RS544_1XN disable
+                             9 - FEC RS544_IEEE enable
+                             10 - FEC RS544_IEEE disable
+                             11 - FEC RS272_1XN enable
+                             12 - FEC RS272_1XN disable
+                             13 - FEC RS272_IEEE enable
+                             14 - FEC RS272_IEEE disable
+        -p|--precoding     This options is used to forward transformation of data that helps mitigate channel-induced
+                           signal distortion. The valid values are "enable" and "disable".
+
+
+.TP
+
+.B \ timesync
+ Timesync operations.
+     Timesync command provides the user to:
+            - To set duty cycle on TSIO outgoing signal.
+            - To set the DLL source for PHC.
+            - Set PTP extended parameters operation. All the parameters are optional.
+            - Configure and display the synchronous ethernet frequency profile, primary and secondary
+              clock state.
+            - TSIO operations for the requested PF/VF
+
+        -d|--dutycycle         To set duty cycle on TSIO outgoing signal.
+        --period               value for period will be treated as in nanoseconds.
+        --up                   Up flag is used to set the duty cycle and should be lesser that period value.
+        --dll                  To set the DLL source for PHC.
+        -s | --source          The valid values range is 0 to 4.
+        -q | --frequency       The valid values range is 0 to 3
+        -p| --ptp              PTP extended parameters operation.
+        --show                 Displays timesync operation.
+        --set                  Configures timesync operation.
+        -p | --primary_pf      Primary physical function ID.
+        -v | --primary_vf      Primary virtual function ID belongs to primary PF ID.
+        -P | --secondary_pf    Secondary physical function ID.
+        -V | --secondary_vf    secondary virtual function ID belongs to secondary PF ID.
+        --synce                Configure and display the synchronous ethernet frequency profile. primary and
+                               secondary clock state. This command is supported only on BCM9575xxx devices.
+        -Q | --frequency_profile      Frequency profile for SyncE recovered clock. Supported profiles are "25MHz".
+        -c | --primary_clock_state    Enable or disable primary clock for PF or port, overriding previous primary
+        -C | --secondary_clock_state  Enable or disable secondary clock for PF or port,overriding
+                                      previous secondary clock setting.
+        --tsio                        Displays or Configures tsio function capability on the pin
+        -t | --tsio_function_pin      Pin Index.Valid Index 0 to 3
+        -u | --pin_usage_string       Pin usage string.
+        --state                       Enable/Disable function capability on the pin
+
+.TP
+
+.B \ counters
+ This command is used to display and clear the PCIe port counters
+
+        -p | --pcie       Display Pcie Counters.
+        -c | --clear      Clear the port counters.
+        -V                Display the detailed information of the PCIe Counters.
+        -P | --port       This option is used to get the port statistics. By default Tx statistics will be collected.
+        -r | --roce       This option is used to get the RoCE statistics.
+        --dir             This is an optional parameter. This option is used to collect the port stats for
+                          Rx/Tx direction.
+        --l2              This option is used to get the L2 statistics.
+
+.TP
+
+.B \ tunnel
+ Performs Custom, GRE Tunnel and RSS(receive side scaling) operations
+        --cfg                    Perform Custom, GRE Tunnel and RSS(receive side scaling) operations.
+        --vxlan                  Option to query or configure vxlan type.
+        -t|--type                Option to provide the IP type. The valid values are "ipv4" and "ipv6".
+        -p|--dest_port           Option to provide the destination port. Valid range is 0-65535.
+        --rss                    Option to query and configure RSS(receive side scaling).
+        --mode                   Option to configure the RSS mode. The valid values are "inner" and "outer".
+        -g|--gre_tunnel_offload  Option to query and configure the custom GRE tunnel offload.
+        --state                  Option to enable or disable the non udp port based GRE tunnel offload.
+
+.TP
+
+.B \ msix
+ Query and configure the number of MSI-X max vectors values for VF's per each PF
+
+        -m|--max_vectors      Retrieves the resigster dump and crashdump from the firmware.
+        --pf                  PF Number to query the table of 8 rows for msix max vectors.
+        --show                Get the msix max vectors for PF.
+        --set                 Confiure the msix max vectors for PF.
+        --all                 Displays msix max vectors for all the PF's.
+.TP
+
+.B \ mh
+ Query and configure the Broadcom Multi-Host PF information.
+        -p|--pf_alloc        PF Number to query Multi-Host PF information
+        --show               Query Multi-Host PF information
+        --set                Configure the Multi-Host PF information
+        --ep0                number of PF to be written on EP0
+        --ep1                number of PF to be written on EP1
+        --ep2                number of PF to be written on EP2
+        --ep3                number of PF to be written on EP3
+
+.TP
+
+.B \ resmgmt
+ Query and Configure resources of the device.
+        -p|--profile       Active profile of the device
+        -r|--roce_max      RoCE enabled PF's on the device(supported only for Stratus & Cumulus-B/WHP)
+        -s|--strategy      strategy associated with each active PF.
+        --min              Minimum bandwidth associated with each active PF
+        --max              Maximum bandwidth associated with each active PF
+        --show             Displays resources of the device
+        --set              Configures resources of the device
+        --bw               Bandwidth to configure for PF N. This is applicable for min, max,
+                           roce_max and max_cmpl
+        -m|--max_completion_rings   maximum completion rings for each active PF
+
+.TP
+.B \ ccparams
+ This command is used to query and configure the congestion control(cc) parameters for RoCE.
+        -d|--dump       Dumps the congestion control parameters into a configuration <xxx>.CFG file.
+                        The file will be generated in the same directory where executable is running.
+        --set           To configure the congestion control parameters using a <xxx>.CFG file.
+        -f              Configuration file to configure the congestion control (cc) parameters.
+
+.TP
+.B \ debug
+ Dumps device internal configuration registers. The dump file can be used by the Broadcom
+ Support for hardware troubleshooting
+        -c|--coredump       Retrieves the resigster dump and crashdump from the firmware.
+        -s|--snapdump       Retrieves the resigster dump, crashdump, firmware log, driver logs and
+                            host tool logs.
+        -d|--ddr            Retrieves crashdump from the DDR if available and this option is only
+                            applicable to coredump command.
+        -l|--l1cc           Retrieves the context l1 cache and this option is only applicable to
+                            coredump command.
+        -f|--file           Option to provide the file name.
+        -K|--token          Perform debug token operations.
+        -a|--supported_claims    Retrieves the supported debug tokens. Below are the supported tokens.
+                                  fwcli      : Provides access to the production firmware command list.
+                                               The valid values are from 0 to 2.
+                                  sdb_en     : Enable or disable the serial debug port. The valid values are 0 and 1.
+                                  diagrw_en  : Enable or disable the GRC register access. The valid values are 0 and 1.
+                                  persist    : Persist the token until expired. The valid values are 0 and 1.
+                                  exp        : Expiration time to indicate when the token expires.
+                                               Value is an epoch based 64-bit integer value.
+                                               The value indicates the number of seconds relative to 1970-01-01T00:00Z in UTC time.
+        -A|--active_claims  Retrieves the active debug tokens.
+        -G|--generate       Generate the unsigned debug token binary for the provided debug claims.
+        -I|--insert         Insert the signature into the unsigned debug token binary for the provided debug claims.
+                            Note: The debug tokens in the claims file for the generate and insert command should match.
+        -N|--signature_file    Option to provide the signature file.
+        -E|--enable            Enable the debug token.
+        -B|--disable           Disable the debug token.
+
+
+.TP
+.B \ pcie
+ Query and configure the PCIe operations.
+        -c|--compliance     This option is used to query or configure the pcie compliance operations.
+        --state             This option is used to configure the pcie compliance state to enable/disable.
+                            The valid values for this option are:
+                             0 - Disable
+                             1 - Enable
+        --show              This option is used to query the pcie compliance state.
+
+
+.TP
+
+.SH EXAMPLES
+ niccli --help
+ niccli --list
+ niccli --list_ethernet
+ niccli -i <index> --help
+ niccli -i <index> show --all
+ niccli --json show.json -i <index> show -d
+ niccli --json -i <index> show -d
+ niccli -i <index> install BCM957504-N1100GD.pkg
+ niccli -i <index> nvm --getoption mac_address --scope 0
+ niccli -i <index> nvm --setoption mac_address --scope 0 --value 00-62-0b-58-fa-da
+ niccli -i <index> verify
+ niccli --dev 1 show --all
+ niccli --dev 00:62:0B:58:FA:DA coredump
+ niccli --pci 0000:3B:00.0 pkgver
+ niccli nvm --list -f BCM957504-N1100GD.pkg
+ niccli devid -f BCM957504-N1100GD.pkg
+
+.SH SEE ALSO
+ Readme.txt released with the package for additional information.
+.SH BUGS
+ Nothing to report.
+.SH AUTHOR
+Broadcom Data Center Solutions Group (broadcom@broadcom.com)
