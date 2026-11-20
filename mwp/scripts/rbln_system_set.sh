@@ -855,6 +855,28 @@ echo
 echo
 sleep 1
 
+echo "# Rebellions GRUB 설정"
+sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="transparent_hugepage=madvise pcie_aspm=force pci=pcie_bus_perf pci=bfsort"/' /etc/default/grub
+echo
+
+changed_line=$(grep '^GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub)
+if echo "$changed_line" | grep -q 'transparent_hugepage=madvise'; then
+   echo "[SUCCESS] GRUB 커널 파라미터 적용"
+else
+   echo "[FAILED] GRUB 커널 파라미터 설정 실패"
+fi
+echo
+echo "[INFO] 현재 설정 (/etc/default/grub) :"
+echo "$changed_line"
+echo
+echo
+sleep 1
+
+echo "# GRUB 적용"
+update-grub
+echo
+sleep 3
+
 
 #################################################################
 # Rebellions 세팅
