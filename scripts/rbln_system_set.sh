@@ -212,6 +212,9 @@ print_titleline "패키지 설치"
 
 print_startline "검수 기본 패키지"
 
+# 프롬프트 및 대화형 팝업 창 차단
+export DEBIAN_FRONTEND=noninteractive
+
 OS_VERSION=$(grep -oP '(?<=VERSION_ID=")[^"]*' /etc/os-release)
 
 COMMON_PKGS=(ipmitool vim net-tools pciutils smartmontools wget curl bc sosreport unzip ethtool lrzsz build-essential dkms)
