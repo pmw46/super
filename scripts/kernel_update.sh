@@ -16,6 +16,8 @@ case "${MODEL}" in
 esac
 
 CURRENT_VER=$(uname -r)
+echo
+echo
 echo "# 모델 : ${MODEL} / 현재 커널 : ${CURRENT_VER} / 대상 커널 : ${TARGET_VER}"
 echo
 echo
