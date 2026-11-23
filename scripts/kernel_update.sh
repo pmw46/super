@@ -37,7 +37,7 @@ apt-mark hold \
 
 # GRUB 설정 변경
 sed -i '/^GRUB_SAVEDEFAULT=/d' /etc/default/grub
-sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /etc/default/grub
+sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved\nGRUB_SAVEDEFAULT=true/' /etc/default/grub
 
 # GRUB 설정 갱신
 update-grub
