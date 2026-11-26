@@ -1,0 +1,2317 @@
+# bash completion for niccli
+shopt -s extglob
+_niccli()
+{
+   local cur prev
+   local prevprev=${COMP_WORDS[COMP_CWORD-2]}
+   _init_completion -n = || return
+
+   SUBOPTS="          \
+      show                    \
+      debug                   \
+      link                    \
+      cable                   \
+	  fw                      \
+      linkdiag                \
+      nvm                     \
+      vf                      \
+      serdes                  \
+      tunnel                  \
+      counters                \
+      timesync                \
+      msix                    \
+      mh                      \
+	  qos                     \
+	  resmgmt                 \
+	  ccparams                \
+	  pcie                    \
+      -h                      \
+      --help                  \
+   "
+
+   NVMOPTS_PERFUNCTION="        \
+      mac_address                                  \
+      mba                                          \
+      mba_boot_type                                \
+      mba_vlan_value                               \
+      mba_vlan                                     \
+      mba_boot_retry_count                         \
+      mba_boot_protocol                            \
+      force_expansion_rom_adv                      \
+      vf_pci_bar2_size                             \
+      number_of_vfs_per_pf                         \
+      msix_vectors_per_vf                          \
+      bw_limit                                     \
+      support_rdma                                 \
+      bw_in_percent                                \
+      bw_limit_valid                               \
+      l2_pf_doorbell_bar_size                      \
+      l2_vf_doorbell_bar_size                      \
+      disable_rdma_sriov                           \
+      enable_truflow                               \
+   "
+
+   NVMOPTS_PERPORT="          \
+      pf_pci_bar2_size                             \
+      enable_wol_on_acpi_pattern                   \
+      magic_packet_wol                             \
+      dcbx_mode                                    \
+      mf_mode                                      \
+      dcbx_capability                              \
+      default_evb_mode                             \
+      firmware_speed_capability_mask_d0            \
+      firmware_link_speed_d0                       \
+      firmware_speed_capability_mask_d3            \
+      firmware_link_speed_d3                       \
+      media_auto_detect                            \
+      link_training                                \
+      link_control_policy                          \
+      autodetect_speed_exclude_mask                \
+      link_precoding_enable                        \
+      lldp_nearest_bridge                          \
+      lldp_nearest_non_tpmr_bridge                 \
+      an_protocol                                  \
+      forward_error_correction                     \
+      total_host_port_control                      \
+      xcvr_rate_auto_sense                         \
+      xcvr_init_wait_time                          \
+   "
+
+   NVMOPTS_PERDEVICE="        \
+      port_hide                                    \
+      port_hide_capable                            \
+      max_num_pf_msix_vectors                      \
+      min_num_pf_msix_vectors                      \
+      pcie_relaxed_ordering                        \
+      multiroot_mode                               \
+      rdma_capable                                 \
+      ignore_ari_capability                        \
+      enable_pme_capability                        \
+      disable_gre_ver_check                        \
+      disable_vxlan_hdr_rsvd_check                 \
+      synce_capable                                \
+      udcc_session_type                            \
+      udcc_tx_event_threshold                      \
+      enable_udcc                                  \
+      ncsi_over_smbus                              \
+      ncsi_over_pcievdm                            \
+      mctp_discovery                               \
+      spdm_mctp_smbus                              \
+      spdm_mctp_pcievdm                            \
+      enable_sriov                                 \
+      host_logging_pf_bitmap                       \
+      ptp_tsio_pin_cfg                             \
+      ptp_sync_in_freq                             \
+      mh_port_breakout_mode                        \
+      disable_tph_rx_packets                       \
+      disable_tph_packet_cmpl                      \
+      pci_preset                                   \
+      rx_cosq_enable                               \
+      tx_cosq_enable                               \
+      cosq_mode                                    \
+      cosq_mode_valid                              \
+      enable_adapter_error_recovery                \
+      enable_l2_em_filter                          \
+      disable_full_crashdump                       \
+      enable_crash_dump_to_host_ddr                \
+      disable_rx_vlan_accel                        \
+      disable_tx_vlan_accel                        \
+      disable_nvgre_rx                             \
+      disable_nvgre_tx                             \
+      cos_precedence_order                         \
+      pf_for_host_mem_chdmp                        \
+      performance_profile                          \
+      afm_rm_resc_strategy                         \
+      enable_power_reduction                       \
+      port_operation_capability                    \
+      port_operation_mode                          \
+      crypto_offload_selection                     \
+      max_num_pf_msix_vectors                      \
+      min_num_pf_msix_vectors                      \
+      pf_pps_rate                                  \
+      vf_pps_rate                                  \
+      enable_hw_lag                                \
+      hw_lag_perf_mode                             \
+      pcie_secure_ats_enable                       \
+      udcc_rx_cnp_threshold                        \
+      dcqcn_1qp_max_perf_enable                    \
+      udcc_stat_poll_optimization_enable           \
+      roce_lag_func_rr_algo_enable                 \
+      roce_udp_src_port_overwrite_enable           \
+      roce_pbl_pg_size_disable                     \
+      roce_infinite_retry_to_retx_enable           \
+      udcc_probe_type                              \
+      average_ipg                                  \
+      hw_tpa_disabled                              \
+      rx_lane_swap                                 \
+      tx_lane_swap                                 \
+      rx_lane_polarity                             \
+      tx_lane_polarity                             \
+      dbg_cfg                                      \
+      enable_sriov                                 \
+      enable_sriov_dscp_insert                     \
+      roce_hw_responder_retx                       \
+      roce_qp_rate_limit_type                      \
+      roce_cq_overflow_detect                      \
+      roce_hw_requester_retx                       \
+      roce_vf_dyn_alloc_enable                     \
+      host_logging_pf_bitmap                       \
+      disable_roce_hwrm_host_log                   \
+      ptp_tsio_pin_cfg                             \
+      ptp_sync_in_freq                             \
+      mh_port_breakout_mode                        \
+      timed_tx_max_overtime                        \
+      timed_tx_pacing_rate_profile                 \
+      pcie_compliance_test_enable                  \
+      enable_roce_dcn                              \
+      enable_roce_bidi_optimization                \
+      platform_profile                             \
+      ptp_sync_in_freq                             \
+      ptp_sync_in_freq                             \
+      ptp_sync_in_freq                             \
+   "
+
+# Create match string from the NVM parameters (separated with | character )
+   nvmlist_perport=""
+   for i in ${NVMOPTS_PERPORT}; do
+      if [ -z ${nvmlist_perport} ];then
+         nvmlist_perport=$i;
+      else
+         nvmlist_perport=${nvmlist_perport}"|"$i;
+      fi
+   done
+   nvmperport_matchstring="@($nvmlist_perport)"
+
+   nvmlist_perfunction=""
+   for i in ${NVMOPTS_PERFUNCTION}; do
+      if [ -z ${nvmlist_perfunction} ];then
+         nvmlist_perfunction=$i;
+      else
+         nvmlist_perfunction=${nvmlist_perfunction}"|"$i;
+      fi
+   done
+   nvmperfunction_matchstring="@($nvmlist_perfunction)"
+
+   nvmlist_perdevice=""
+   for i in ${NVMOPTS_PERDEVICE}; do
+      if [ -z ${nvmlist_perdevice} ];then
+         nvmlist_perdevice=$i;
+      else
+         nvmlist_perdevice=${nvmlist_perdevice}"|"$i;
+      fi
+   done
+   nvmperdevice_matchstring="@($nvmlist_perdevice)"
+
+    NVMOPTIONS="                   \
+      --view                       \
+      -l                           \
+      --list                       \
+      --verify                     \
+      -n                           \
+      --sync                       \
+      -F                           \
+      --restore_factory_defaults   \
+      -r                           \
+      --dir_read                   \
+      -w                           \
+      --dir_write                  \
+      -S                           \
+      --saveoptions                \
+      -g                           \
+      --getoption                  \
+      -s                           \
+      --setoption                  \
+      -L                           \
+      --listoptions                \
+      -O                           \
+      --optionhelp                 \
+      -b                           \
+      --backup                     \
+   "
+
+   # nvm command autocompletion
+   case ${words[3]} in
+      nvm)
+	 case ${words[4]} in
+      --view)
+      case $prev in
+      --view)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-V -f -t --type" -- $cur) )
+         return 0
+         ;;
+      -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-V -f -t --type" -- $cur))
+         return 0
+         ;;
+       esac
+        ;;
+	 esac
+	 case ${words[4]} in
+      -l|--list|--verify)
+      case $prev in
+       -l|--list|--verify)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-V -f" -- $cur) )
+         return 0
+         ;;
+      -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-V -f" -- $cur))
+         return 0
+         ;;
+       esac
+        ;;
+	 esac
+	 case ${words[4]} in
+      -r|--dir_read|-w|--dir_write)
+      case $prev in
+       -r|--dir_read|-w|--dir_write)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f" -- $cur) )
+         return 0
+         ;;
+      -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      -t|--type)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+       esac
+      case $prevprev in
+       -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-t --type" -- $cur) )
+         return 0
+         ;;
+	   esac
+        ;;
+	  esac
+	 case ${words[4]} in
+      -s|--setoption)
+      case $prev in
+      -s|--setoption)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "${NVMOPTS_PERDEVICE} ${NVMOPTS_PERPORT} ${NVMOPTS_PERFUNCTION}" -- $cur) )
+         return 0
+         ;;
+      ${nvmperport_matchstring} )
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-v --value" -- $cur) )
+         return 0
+         ;;
+      ${nvmperfunction_matchstring} )
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-v --value" -- $cur) )
+         return 0
+         ;;
+      -v|--value)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      --scope)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "0 1 2 3..." -- $cur) )
+         return 0
+         ;;
+       esac
+      case $prevprev in
+      -v|--value)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--scope" -- $cur) )
+         return 0
+         ;;
+       esac
+        ;;
+	 esac
+      case $prev in
+      nvm)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "${NVMOPTIONS}" -- $cur) )
+         return 0
+         ;;
+      -n|--sync|-O|--optionhelp|--diff|--silent|--cfg)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      -F|--restore_factory_defaults)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--silent" -- $cur) )
+         return 0
+         ;;
+      -S|--saveoptions)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f" -- $cur) )
+         return 0
+         ;;
+      -b|--backup)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--cfg" -- $cur) )
+         return 0
+         ;;
+      -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      -L|--listoptions)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--diff" -- $cur) )
+         return 0
+         ;;
+      -g|--getoption)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "${NVMOPTS_PERDEVICE} ${NVMOPTS_PERPORT} ${NVMOPTS_PERFUNCTION}  " -- $cur) )
+         return 0
+         ;;
+      ${nvmperport_matchstring} )
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--scope " -- $cur) )
+         return 0
+         ;;
+      ${nvmperfunction_matchstring} )
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--scope " -- $cur) )
+         return 0
+         ;;
+      ${nvmperdevice_matchstring})
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      --scope)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "0 1 2 3..." -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # show command autocompletion
+   case ${words[3]} in
+      show)
+      case $prev in
+      show)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-p --pkg_ver -D --device_pci_ids -d --device_info --all -c --certificate -n --nvm_measurement --health -r --recommendations -g --pcb_gen2_otp" -- $cur) )
+         return 0
+         ;;
+      -p|--pkg_ver|-D|--device_pci_ids)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f" -- $cur) )
+         return 0
+         ;;
+      -f|-pkg)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+            COMPREPLY=()
+         else
+            COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      -c|--certificate)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-s --slot" -- $cur) )
+         return 0
+         ;;
+      -s|--slot)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "0 1 2 3 4 5 6 7" -- $cur) )
+         return 0
+         ;;
+      -d|--device_info|--all|-n|--nvm_measurement|--health|-g|--pcb_gen2_otp)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      -r|--recommendations)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--nvm --pcie -V" -- $cur) )
+         return 0
+         ;;
+      --pcie | -V)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--pcie -V" -- $cur) )
+         return 0
+         ;;
+      --nvm)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f" -- $cur) )
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -f|-s|--slot)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+# debug command autocompletion
+   case ${words[3]} in
+      debug)
+      case ${words[5]} in
+      -G|--generate)
+        case $prev in
+        -G|--generate)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=( $(compgen -W "-f --file" -- $cur) )
+           return 0
+           ;;
+        -f|--file)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=()
+           return 0
+           ;;
+        esac
+        case $prevprev in
+        -f|--file)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=( $(compgen -W "-o --output_file" -- $cur) )
+           return 0
+           ;;
+        esac
+        ;;
+      esac
+      case ${words[5]} in
+      -I|--insert)
+        case $prev in
+        -I|--insert)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=( $(compgen -W "-N --signature_file" -- $cur) )
+           return 0
+           ;;
+        -N|--signature_file)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=()
+           return 0
+           ;;
+        -f|--file)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=()
+           return 0
+           ;;
+        esac
+        case $prevprev in
+        -f|--file)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=( $(compgen -W "-o --output_file" -- $cur) )
+           return 0
+           ;;
+        -N|--signature_file)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=( $(compgen -W "-f --file" -- $cur) )
+           return 0
+           ;;
+        esac
+        ;;
+      esac
+      case ${words[5]} in
+      -E|--enable)
+      case $prev in
+      -E|--enable)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f --file" -- $cur) )
+         return 0
+         ;;
+      -f|--file)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -f|--file)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      esac
+         ;;
+      esac
+      case $prev in
+      debug)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-c --coredump -s --snapdump -K --token" -- $cur) )
+         return 0
+         ;;
+      -s|--snapdump)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f" -- $cur) )
+         return 0
+         ;;
+      -c|--coredump)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-d --ddr -l --l1cc -f" -- $cur) )
+         return 0
+         ;;
+      -d|-l|--ddr|--l1cc)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f" -- $cur) )
+         return 0
+         ;;
+      -K|--token)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-a --supported_claims -A --active_claims -G --generate -I --insert -E --enable -B --disable" -- $cur) )
+         return 0
+         ;;
+      -a|--supported_claims|-A|--active_claims)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show -f " -- $cur) )
+         return 0
+         ;;
+      -o|--output_file)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      -E|--enable)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f --file" -- $cur) )
+         return 0
+         ;;
+      -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      --show|-B|--disable)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+
+   LINKDIAG_SET_OPTIONS="          \
+      --pre1                             \
+      --pre2                   \
+      --pre3                             \
+      dcbx_mode                                    \
+      mf_mode                                      \
+      dcbx_capability                              \
+      default_evb_mode                             \
+      firmware_speed_capability_mask_d0            \
+      firmware_link_speed_d0                       \
+      firmware_speed_capability_mask_d3            \
+      firmware_link_speed_d3                       \
+      media_auto_detect                            \
+      link_training                                \
+      link_control_policy                          \
+      autodetect_speed_exclude_mask                \
+      lldp_nearest_bridge                          \
+      lldp_nearest_non_tpmr_bridge                 \
+      an_protocol                                  \
+      forward_error_correction                     \
+      total_host_port_control                      \
+      xcvr_rate_auto_sense                         \
+   "
+
+
+   # linkdiag command autocompletion
+   case ${words[3]} in
+      linkdiag)
+	 case ${words[4]} in
+      -D|--dscdump)
+      case $prev in
+      -D|--dscdump)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-l --lane" -- $cur) )
+         return 0
+         ;;
+      -l|--lane)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16" -- $cur) )
+         return 0
+         ;;
+      -a|--diag_level)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+        esac
+	  case $prevprev in
+      -l|--lane)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-a --diag_level" -- $cur) )
+         return 0
+         ;;
+       esac
+        ;;
+	 esac
+	 case ${words[4]} in
+      -L|--loopback)
+      case $prev in
+      -L|--loopback)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show -R --phy_remote -p --phy_local -m --mac_local -d --disable --external" -- $cur) )
+         return 0
+         ;;
+      --external)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--RJ45" -- $cur) )
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+        esac
+        ;;
+	 esac
+	 case ${words[4]} in
+      -P|--prbs_test)
+      case $prev in
+      -P|--prbs_test)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-e --enable -d --disable" -- $cur) )
+         return 0
+         ;;
+      -e|--enable|-d|--disable|--tcode)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--mode -r --rx_lane_mask -t --tx_lane_mask -s --duration --tcode -b --ber" -- $cur) )
+         return 0
+         ;;
+      --mode|-r|--rx_lane_mask|-t|--tx_lane_mask|-s|--duration|--tcode|-b|--ber)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+        esac
+      case $prevprev in
+      --mode|-r|--rx_lane_mask|-t|--tx_lane_mask|-s|--duration|-b|--ber )
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--mode -r --rx_lane_mask -t --tx_lane_mask -s --duration --tcode -b --ber" -- $cur) )
+         return 0
+         ;;
+        esac
+        ;;
+	 esac
+	 case ${words[5]} in
+	 --show)
+	  case $prevprev in
+      -l|--lane)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+        esac
+        ;;
+	   esac
+      case $prev in
+      linkdiag)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-T --txfir -D --dscdump -L --loopback -P --prbs_test -F --fdrstat" -- $cur) )
+         return 0
+         ;;
+      -F|--fdrstat)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--start --stop --clear --counters" -- $cur) )
+         return 0
+         ;;
+      --start|--stop|--clear|--counters)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( )
+         return 0
+         ;;
+      -T|--txfir)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show --set" -- $cur) )
+         return 0
+         ;;
+      --show|--set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-m --modulation_type" -- $cur) )
+         return 0
+         ;;
+      -m|--modulation_type)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "NRZ PAM4 C2MNRZ C2MPAM4 PAM4-112 C2MPAM4-112G LPOPAM4-112G" -- $cur) )
+         return 0
+         ;;
+      -l|--lane)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16" -- $cur) )
+         return 0
+         ;;
+      --pre1)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--pre2" -- $cur) )
+         return 0
+         ;;
+      --pre2|--pre3|--main|--post1|--post2|--post3|--amp|--nlcl|--nlcu)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--pre3 --main --post1 --post2 --post3 --amp --nlcl --nlcu" -- $cur) )
+         return 0
+         ;;
+        esac
+      case $prevprev in
+      -m|--modulation_type)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-l --lane" -- $cur))
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -l|--lane)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--pre1" -- $cur))
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # counters command autocompletion
+   case ${words[3]} in
+      counters)
+      case $prev in
+      counters)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-p --pcie -c --clear -P --port -r --roce" -- $cur) )
+         return 0
+         ;;
+      -p|--pcie|-c|--clear|rx|tx|-r|--roce)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      -P|--port )
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--dir" -- $cur) )
+         return 0
+         ;;
+      --dir )
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "rx tx" -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # fw command autocompletion
+   case ${words[3]} in
+      fw)
+	  case ${words[4]} in
+      -l|--livepatch)
+       case $prev in
+       -l|--livepatch)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show -a --activate -d --deactivate -p --patch_update" -- $cur) )
+         return 0
+         ;;
+       -p|--patch_update|-a|--activate|-d|--deactivate)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+       -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+       esac
+       case $prevprev in
+       -p|--patch_update)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-f" -- $cur))
+         return 0
+         ;;
+       esac
+       case $prevprev in
+       -f|-a|--activate|-d|--deactivate)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+       esac
+       ;;
+      esac
+      case ${words[5]} in
+      --online)
+       case $prev in
+      --online)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--force -y --yes" -- $cur))
+         return 0
+         ;;
+      --force|-y|--yes)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--force -y --yes" -- $cur))
+         return 0
+         ;;
+       esac
+       ;;
+      esac
+      case $prev in
+      fw)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-u --update --reset -l --livepatch" -- $cur) )
+         return 0
+         ;;
+      --reset)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--immediate" -- $cur) )
+         return 0
+         ;;
+      -u|--update)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-f  --online" -- $cur) )
+         return 0
+         ;;
+      -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      --force|-r|--recovery|-y|--yes)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--force -r --recovery -y --yes" -- $cur))
+         return 0
+         ;;
+      --immediate|--all|--show)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      -p|--patch_update)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--force -r --recovery -y --yes" -- $cur))
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # vf command autocompletion
+   case ${words[3]} in
+      vf)
+   case ${words[5]} in
+      --set)
+      case $prevprev in
+      -v|--vf_index)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--state" -- $cur))
+         return 0
+         ;;
+      esac
+      ;;
+      esac
+   case ${words[4]} in
+      -a|--add_ntuple_filter)
+      case $prev in
+      -a|--add_ntuple_filter)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-m --macaddress" -- $cur))
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-p --dest_port -P --dst_port_mask -v --vf_index -T --ip_type" -- $cur))
+         return 0
+         ;;
+      esac
+      ;;
+      esac
+      case $prev in
+      vf)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-t --trust -a --add_ntuple_filter -d	--free_ntuple_filter -M --peer_mem_map" -- $cur) )
+         return 0
+         ;;
+      -t|--trust)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--show --set" -- $cur))
+         return 0
+         ;;
+      --show|--set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-v --vf_index" -- $cur))
+         return 0
+         ;;
+      -v|--vf_index)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local -a numbers=($(seq 1 16))
+         COMPREPLY=($(compgen -W "${numbers[*]}" -- $cur))
+         return 0
+         ;;
+      --state)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "enable disable" -- $cur))
+         return 0
+         ;;
+      enable|disable|-l|--filter_id)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      -d|--free_ntuple_filter)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-l --filter_id" -- $cur))
+         return 0
+         ;;
+      -M|--peer_mem_map)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--hpa --gpa --size" -- $cur))
+         return 0
+         ;;
+      --hpa|--gpa|--size)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      --size)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--hpa --gpa" -- $cur))
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      --hpa|--gpa|--size)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--hpa --gpa --size" -- $cur))
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # serdes command autocompletion
+   case ${words[3]} in
+      serdes)
+   case ${words[5]} in
+      -e|--ethernet)
+      case $prev in
+      -e|--ethernet)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-l --lane -P --plot" -- $cur) )
+         return 0
+         ;;
+      -P|--plot)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-l --lane" -- $cur) )
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -l|--lane)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-P --plot" -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+      esac
+      case $prev in
+      serdes)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--eye" -- $cur) )
+         return 0
+         ;;
+      --eye)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-e --ethernet -p --pci" -- $cur) )
+         return 0
+         ;;
+      -p|--pci)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-l --lane -s --stop" -- $cur) )
+         return 0
+         ;;
+      -l|--lane)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local -a numbers=($(seq 0 16))
+         COMPREPLY=($(compgen -W "${numbers[*]}" -- $cur))
+         return 0
+         ;;
+   -s|--stop)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+   -P|--plot)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-t --target_ber" -- $cur) )
+         return 0
+         ;;
+   -t|--target_ber)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -l|--lane)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-P --plot" -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # tunnel command autocompletion
+   case ${words[3]} in
+      tunnel)
+     case ${words[5]} in
+      -g|--gre_tunnel_offload)
+      case $prev in
+      -g|--gre_tunnel_offload)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--show --set" -- $cur))
+         return 0
+         ;;
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--state" -- $cur))
+         return 0
+         ;;
+      --state)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "enable disable" -- $cur))
+         return 0
+         ;;
+      esac
+      ;;
+      esac
+      case $prev in
+      tunnel)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--cfg" -- $cur))
+         return 0
+         ;;
+      --cfg)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--vxlan --rss -g --gre_tunnel_offload" -- $cur))
+         return 0
+         ;;
+      --vxlan)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-t --type --del --add" -- $cur))
+         return 0
+         ;;
+      --del|--add)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-t --type" -- $cur))
+         return 0
+         ;;
+      -t|--type)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "ipv4 ipv6" -- $cur))
+         return 0
+         ;;
+      ipv4|ipv6)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--show -p --dest_port" -- $cur))
+         return 0
+         ;;
+      --rss)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--show --set" -- $cur))
+         return 0
+         ;;
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--mode" -- $cur))
+         return 0
+         ;;
+      --mode)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "inner outer" -- $cur))
+         return 0
+         ;;
+      --show|-p|--dest_port|inner|outer|enable|disable)
+         cur="${cur##*,}"
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # cable command autocompletion
+   case ${words[3]} in
+      cable)
+   case ${words[4]} in
+      -w|--write_module_eeprom)
+      case $prevprev in
+      -p|--page_number|-o|--offset|-v|--value)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-p --page_number -o --offset -v --value" -- $cur) )
+         return 0
+         ;;
+      esac
+         ;;
+      esac
+      case $prevprev in
+      -t|--loopback_type)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--lane" -- $cur) )
+         return 0
+         ;;
+      esac
+      case $prev in
+      cable)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W " -m --module_info -r --read_module_eeprom -w --write_module_eeprom -M --module_loopback " -- $cur) )
+         return 0
+         ;;
+      -M|--module_loopback )
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-t --loopback_type" -- $cur) )
+         return 0
+         ;;
+      -m|--module_info)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show" -- $cur) )
+         return 0
+         ;;
+      --show|-t|--loopback_type|--lane)
+         cur="${cur##*,}"
+		 COMPREPLY=()
+         return 0
+         ;;
+      -r|--read_module_eeprom)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-p --page_number -o --offset -l --length -b --bank -i --i2c_address" -- $cur) )
+         return 0
+         ;;
+      -w|--write_module_eeprom)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-p --page_number -o --offset -v --value" -- $cur) )
+         return 0
+         ;;
+      -p|--page_number|-o|--offset|-l|--length|-b|--bank|-i|--i2c_address|-v|--value)
+         cur="${cur##*,}"
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-p --page_number -o --offset -l --length -b --bank -i --i2c_address  -v --value" -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # link command autocompletion
+   case ${words[3]} in
+      link)
+      case $prev in
+      link)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-s --status -c --counters -p --port_state -S --port_speed -P --precoding" -- $cur) )
+         return 0
+         ;;
+      -c|--counters)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show" -- $cur) )
+         return 0
+         ;;
+      -s|--status)
+         cur="${cur##*,}"
+		 COMPREPLY=()
+         return 0
+         ;;
+      --show)
+         cur="${cur##*,}"
+		 COMPREPLY=()
+         return 0
+         ;;
+      -p|--port_state)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "0 1 2" -- $cur) )
+         return 0
+         ;;
+      -P|--precoding)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "enable disable" -- $cur) )
+         return 0
+         ;;
+      enable|disable|on|--speed|--lanes|--fec)
+         cur="${cur##*,}"
+         COMPREPLY=()
+         return 0
+         ;;
+      -S|--port_speed)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-a --autoneg" -- $cur) )
+         return 0
+         ;;
+      -a|--autoneg|-t|--training)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "on off" -- $cur) )
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -a|--autoneg|--speed|--lanes|--fec|-t|--training)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--speed --lanes --fec -t --training" -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # timesync command autocompletion
+   case ${words[3]} in
+      timesync)
+      case $prev in
+      timesync)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-d --duty_cycle --dll --ptp --synce --tsio" -- $cur) )
+         return 0
+         ;;
+      -d|--duty_cycle)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--period" -- $cur) )
+         return 0
+         ;;
+      --period)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--up" -- $cur) )
+         return 0
+         ;;
+	   --dll)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-s --source" -- $cur) )
+         return 0
+         ;;
+	   -s|--source)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-q|--frequency" -- $cur) )
+         return 0
+         ;;
+      --up|-q|--frequency|--show|--show|--state)
+         cur="${cur##*,}"
+         return 0
+         ;;
+      --ptp)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show  --set" -- $cur) )
+         return 0
+         ;;
+	   --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-p --primary_pf" -- $cur) )
+         return 0
+         ;;
+      -p|--primary_pf|-v|--primary_vf|-P|--secondary_pf|-V|--secondary_vf)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      -s|--synce)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show --set" -- $cur) )
+         return 0
+         ;;
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--frequency_profile" -- $cur) )
+         return 0
+         ;;
+      --frequency_profile)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--primary_clock_state --secondary_clock_state" -- $cur) )
+         return 0
+         ;;
+      --primary_clock_state|--secondary_clock_state)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--primary_clock_state --secondary_clock_state" -- $cur) )
+         return 0
+         ;;
+      -t|--tsio)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--tsio_function_pin" -- $cur) )
+         return 0
+         ;;
+      --tsio_function_pin)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--pin_usage_string" -- $cur) )
+         return 0
+         ;;
+      --pin_usage_string)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--state" -- $cur) )
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -p|--primary_pf)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-v --primary_vf -P --secondary_pf -V --secondary_vf" -- $cur) )
+         return 0
+         ;;
+      esac
+      case $prevprev in
+      -v|--primary_vf|-P| --secondary_pf|-V|--secondary_vf)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-v --primary_vf -P --secondary_pf -V --secondary_vf" -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # msix command autocompletion
+   case ${words[3]} in
+      msix)
+      case $prev in
+      msix)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-m --max_vectors" -- $cur) )
+         return 0
+         ;;
+      -m|--max_vectors)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show --set" -- $cur) )
+         return 0
+         ;;
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--pf" -- $cur) )
+         return 0
+         ;;
+      --show)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--all --pf" -- $cur) )
+         return 0
+         ;;
+      --all|--pf)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+
+   # mh command autocompletion
+   case ${words[3]} in
+      mh)
+      case $prev in
+      mh)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-p --pf_alloc" -- $cur) )
+         return 0
+         ;;
+      -p|--pf_alloc)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--set --show" -- $cur) )
+         return 0
+         ;;
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--ep0 --ep1 --ep2 --ep3" -- $cur) )
+         return 0
+         ;;
+      --show)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+	  --ep0|--ep1|--ep2|--ep3)
+         cur="${cur##*,}"
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--ep0 --ep1 --ep2 --ep3" -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+
+   QOSOPTIONS="             \
+      -E                    \
+      --ets                 \
+      --pfc                 \
+      --up2tc               \
+      --apptlv              \
+      -D                    \
+      --dscp2prio           \
+      -l                    \
+      --listmap             \
+      --tc                  \
+      -n                    \
+      --ingress             \
+      -e                    \
+      --egress              \
+      -r                    \
+      --rx_port_rate_limit  \
+      -R                    \
+      --rx_rate_limit       \
+      -X                    \
+      --rx_ep_rate_limit    \
+      -t                    \
+      --tx_partition_rate_limit  \
+      -P                         \
+      --tx_port_rate_limit       \
+      -x                         \
+      --tx_ep_rate_limit         \
+      -g                         \
+      --timed_tx_pacing_rate_profile   \
+   "
+
+# qos command autocompletion
+   case ${words[3]} in
+      qos)
+	case ${words[4]} in
+	-n|--ingress)
+	  case $prev in
+	  -n|--ingress)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--cosq" -- $cur) )
+		 return 0
+		 ;;
+	  --cosq)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--show --set" -- $cur) )
+		 return 0
+		 ;;
+	  --show)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "-p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	 --set)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--state" -- $cur) )
+		 return 0
+		 ;;
+	  --state)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--mode -p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  --mode)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "-p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  -p|--persistent)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+	     esac
+	     ;;
+	  esac
+	case ${words[4]} in
+	-e|--egress)
+	  case $prev in
+	  -e|--egress)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--cosq" -- $cur) )
+		 return 0
+		 ;;
+	  --cosq)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--show --set" -- $cur) )
+		 return 0
+		 ;;
+	 --set)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--state" -- $cur) )
+		 return 0
+		 ;;
+	  --show|--state)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "-p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  -p|--persistent)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+	    esac
+        ;;
+	  esac
+	 case ${words[4]} in
+	--up2tc)
+	  case $prev in
+	  --up2tc)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--pri" -- $cur) )
+		 return 0
+		 ;;
+	 --pri)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+       esac
+       ;;
+	  esac
+	 case ${words[4]} in
+	-x|--tx_ep_rate_limit)
+       case ${words[5]} in
+      --port)
+        case $prev in
+        --port)
+           cur="${cur##*,}"
+           compopt -o nospace
+           COMPREPLY=( $(compgen -W "--show" -- $cur) )
+           return 0
+           ;;
+          esac
+         ;;
+        esac
+	  case $prev in
+	  -x|--tx_ep_rate_limit)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--port --set" -- $cur) )
+		 return 0
+		 ;;
+	  --set)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--port" -- $cur) )
+		 return 0
+		 ;;
+	  --port)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+         COMPREPLY=( $(compgen -W "--ep0" -- $cur) )
+		 return 0
+		 ;;
+	  --ep0)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--ep1 --ep2 --ep3 -p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  --ep1|--ep2|--ep3)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--ep1 --ep2 --ep3 -p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  --show|-p|--persistent)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+	     esac
+	     ;;
+	   esac
+	 case ${words[4]} in
+     -X|--rx_ep_rate_limit)
+	  case $prev in
+	  -X|--rx_ep_rate_limit)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--set" -- $cur) )
+		 return 0
+		 ;;
+	  --set)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--ep0" -- $cur) )
+		 return 0
+		 ;;
+	  --ep0)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--ep1 --ep2 --ep3 -p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  --ep1|--ep2|--ep3)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--ep1 --ep2 --ep3 -p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  -p|--persistent)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+	    esac
+        ;;
+	  esac
+	 case ${words[4]} in
+	-R|--rx_rate_limit)
+	  case $prev in
+	  -R|--rx_rate_limit)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--show" -- $cur) )
+		 return 0
+		 ;;
+	  --show)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "-p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  -p|--persistent)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+        esac
+        ;;
+	   esac
+	 case ${words[4]} in
+	-r|--rx_port_rate_limit)
+	  case $prev in
+	  -r|--rx_port_rate_limit)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--set" -- $cur) )
+		 return 0
+		 ;;
+	 --set)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--max" -- $cur) )
+		 return 0
+		 ;;
+	  --max)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "-p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  -p|--persistent)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+	esac
+	;;
+	esac
+	 case ${words[4]} in
+	-t|--tx_partition_rate_limit)
+	  case $prev in
+	  -t|--tx_partition_rate_limit)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--show --set" -- $cur) )
+		 return 0
+		 ;;
+	 --set)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--max" -- $cur) )
+		 return 0
+		 ;;
+	  --max|--show)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "-p --persistent" -- $cur) )
+		 return 0
+		 ;;
+	  -p|--persistent)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+	     esac
+	     ;;
+	  esac
+	  case ${words[4]} in
+	  -P|--tx_port_rate_limit)
+        case $prev in
+        -P|--tx_port_rate_limit)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--show --set" -- $cur) )
+		 return 0
+		 ;;
+	    --set)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=( $(compgen -W "--max" -- $cur) )
+		 return 0
+		 ;;
+        --max|--show)
+		 cur="${cur##*,}"
+		 compopt -o nospace
+		 COMPREPLY=()
+		 return 0
+		 ;;
+	  esac
+		 ;;
+	  esac
+      case $prev in
+      qos)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W '${QOSOPTIONS} ' -- "$cur"))
+         return 0
+         ;;
+      -E|--ets)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--tsa --show" -- $cur) )
+         return 0
+         ;;
+      --show|--enable|--app)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      --tsa|--tcbw|--up2tc)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--tsa --up2tc --tcbw" -- $cur) )
+         return 0
+         ;;
+      --pfc)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--enable" -- $cur) )
+         return 0
+         ;;
+      --apptlv)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-a --add -d --del" -- $cur) )
+         return 0
+         ;;
+      -a|--add|-d|--del)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--app" -- $cur) )
+         return 0
+         ;;
+      -D|--dscp2prio|--pri2cos|-T|--rate_limit)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      -l|--listmap)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--pri2cos" -- $cur) )
+         return 0
+         ;;
+       --tc)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--set" -- $cur) )
+         return 0
+         ;;
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "-T --rate_limit" -- $cur) )
+         return 0
+         ;;
+      -g|--timed_tx_pacing_rate_profile)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "--show" -- $cur) )
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # resmgmt command autocompletion
+   case ${words[3]} in
+    resmgmt)
+	 case ${words[4]} in
+      --set)
+      case $prev in
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--pf --all --min --max -r --roce_max -m --max_completion_rings --bw -s --strategy" -- $cur))
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--pf --all --min --max -r --roce_max -m --max_completion_rings --bw -s --strategy" -- $cur))
+         return 0
+         ;;
+       esac
+        ;;
+	 esac
+	 case ${words[5]} in
+      --set)
+      case $prev in
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--pf --all --min --max -r --roce_max -m --max_completion_rings --bw -s --strategy" -- $cur))
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--pf --all --min --max -r --roce_max -m --max_completion_rings --bw -s --strategy" -- $cur))
+         return 0
+         ;;
+       esac
+        ;;
+	 esac
+      case $prev in
+      resmgmt|--pf|--all)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--pf --all --set -p --profile --min --max	--roce_max -m --max_completion_rings -s --strategy --show" -- $cur))
+         return 0
+         ;;
+      *)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--pf --all -p --profile --min --max	--roce_max -m --max_completion_rings -s --strategy --show" -- $cur))
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+
+   # Congestion Control Configuration command autocompletion
+   case ${words[3]} in
+    ccparams)
+      case $prev in
+      ccparams)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W " -d --dump --set" -- $cur))
+         return 0
+         ;;
+      -d|--dump)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      --set)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-f" -- $cur))
+         return 0
+         ;;
+      -f)
+         cur="${cur##*,}"
+         compopt -o nospace
+         local exact_match=$(compgen -f -- "$cur" | grep -Fx "$cur")
+         if [[ -n $exact_match ]]; then
+         COMPREPLY=()
+         else
+         COMPREPLY=($(compgen -f -- "$cur"))
+         fi
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   # pcie command autocompletion
+   case ${words[3]} in
+    pcie)
+      case $prev in
+      pcie)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "-c --compliance" -- $cur))
+         return 0
+         ;;
+      -c|--compliance)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "--state --show" -- $cur))
+         return 0
+         ;;
+      --state)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=($(compgen -W "0 1" -- $cur))
+         return 0
+         ;;
+      --show|0|1)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+
+   case $prevprev in
+      -i|--index|--dev)
+         COMPREPLY=($(compgen -W '$SUBOPTS ' -- "$cur"))
+         return 0
+         ;;
+   esac
+   case ${words[1]} in
+      --pci)
+      case $prev in
+        --pci)
+          cur="${cur##*,}"
+          compopt -o nospace
+          COMPREPLY=()
+          return 0
+          ;;
+       esac
+       ;;
+   esac
+   case $prev in
+      -i|--index)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "1 2 3 4" -- $cur) )
+         return 0
+         ;;
+      --dev)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=( $(compgen -W "1 2 3 4" -- $cur) )
+         return 0
+         ;;
+   esac
+   case ${words[1]} in
+      -j|--json|-l|--list|-d|--list_devices|-e|--list_ethernet|--version|--batch)
+      case $prev in
+      -j|--json|-l|--list|-d|--list_devices|-e|--list_ethernet|--version|--batch)
+         cur="${cur##*,}"
+         compopt -o nospace
+         COMPREPLY=()
+         return 0
+         ;;
+      esac
+      ;;
+   esac
+   # Help command autocompletion
+   case $prev in
+    -h|--help)
+      cur="${cur##*,}"
+      compopt -o nospace
+      COMPREPLY=( $(compgen -W "show nvm fw debug vf serdes tunnel link counters timesync msix mh qos resmgmt ccparams pcie linkdiag cable" -- $cur) )
+      return 0
+      ;;
+   esac
+
+
+
+   OPTS="               \
+      -i                \
+      --index           \
+      --pci             \
+      --dev             \
+      -l                \
+      --list            \
+      -d                \
+      --list_devices    \
+      -e                \
+      --list_ethernet   \
+      -j                \
+      --json            \
+      --batch           \
+      -h                \
+      --help            \
+      -v                \
+      --version         \
+      --search          \
+   "
+   case $cur in
+      *)
+         COMPREPLY=($(compgen -W '${OPTS} ' -- "$cur"))
+         return 0
+         ;;
+
+      -*)
+         COMPREPLY=($(compgen -W '${OPTS} ' -- "$cur"))
+         return 0
+         ;;
+   esac
+
+
+
+} &&
+complete -F _niccli niccli
+

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+PREFIX=/opt/niccli
+
+# Execute niccli binary from package installation prefix
+if [ -f ${PREFIX}/niccli.$( uname -m ) ]; then
+  exec ${PREFIX}/niccli.$( uname -m ) $@
+fi
+
+# Execute niccli binary from current directory
+if [ -f ./niccli.$( uname -m ) ]; then
+  exec ./niccli.$( uname -m ) $@
+fi
+
+echo niccli is not installed in the expected location: ${PREFIX}/niccli.$( uname -m ) or in the current working directory.
+exit 1
